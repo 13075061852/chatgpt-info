@@ -1,0 +1,8 @@
+name = "chatgpt-info"
+compatibility_date = "2026-05-25"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "DATA_STORE"
+id = "replace-with-production-kv-id"
+preview_id = "replace-with-preview-kv-id"

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 订阅</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35" /><circle cx="11" cy="11" r="7" /></symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+      <symbol id="icon-table" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M4 10h16M10 5v14" /></symbol>
+      <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></symbol>
+      <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></symbol>
+      <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M20 7H5a3 3 0 0 0 0 6h15v6H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h13a2 2 0 0 1 2 2z" /><path d="M17 13h.01" /></symbol>
+      <symbol id="icon-box" viewBox="0 0 24 24"><path d="m21 8-9-5-9 5 9 5 9-5Z" /><path d="M3 8v8l9 5 9-5V8M12 13v8" /></symbol>
+      <symbol id="icon-network" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3" /><circle cx="18" cy="6" r="3" /><circle cx="12" cy="18" r="3" /><path d="m8.6 8.1 2.8 6.1M15.4 8.1l-2.8 6.1" /></symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" /><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.65V21a2 2 0 1 1-4 0v-.06A1.8 1.8 0 0 0 8.75 19.3a1.8 1.8 0 0 0-1.98.36l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.8 1.8 0 0 0 4.3 15a1.8 1.8 0 0 0-1.65-1.1H2.6a2 2 0 1 1 0-4h.06A1.8 1.8 0 0 0 4.3 8.8a1.8 1.8 0 0 0-.36-1.98l-.04-.04A2 2 0 1 1 6.73 3.95l.04.04a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 9.85 2.7V2.6a2 2 0 1 1 4 0v.06a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.1a2 2 0 1 1 0 4h-.06A1.8 1.8 0 0 0 19.4 15Z" /></symbol>
+      <symbol id="icon-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></symbol>
+      <symbol id="icon-clipboard" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2" /><path d="M9 4a3 3 0 0 1 6 0M9 12h6M9 16h6" /></symbol>
+      <symbol id="icon-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M7.5 8A2.5 2.5 0 1 1 12 6.5M16.5 8A2.5 2.5 0 1 0 12 6.5" /></symbol>
+      <symbol id="icon-yuan" viewBox="0 0 24 24"><path d="m6 4 6 8 6-8M8 12h8M8 16h8M12 12v8" /></symbol>
+      <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7v5l-4 2v-7z" /></symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
+      <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 11v6M14 11v6" /></symbol>
+      <symbol id="icon-first" viewBox="0 0 24 24"><path d="M6 5v14M18 6l-6 6 6 6" /></symbol>
+      <symbol id="icon-prev" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
+      <symbol id="icon-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+      <symbol id="icon-last" viewBox="0 0 24 24"><path d="M18 5v14M6 6l6 6-6 6" /></symbol>
+    </svg>
+
+    <div id="loginView" class="auth-screen" hidden>
+      <main class="login-panel">
+        <div class="brand-row">
+          <img class="brand-mark" src="/favicon.png" alt="" />
+          <div>
+            <h1>AI 订阅</h1>
+          </div>
+        </div>
+        <form id="loginForm" class="login-form">
+          <label>
+            用户名
+            <input name="username" autocomplete="username" value="admin" required />
+          </label>
+          <label>
+            密码
+            <input name="password" type="password" autocomplete="current-password" placeholder="请输入密码" required />
+          </label>
+          <p id="loginError" class="form-error" role="alert"></p>
+          <button class="primary-button" type="submit">登录</button>
+        </form>
+      </main>
+    </div>
+
+    <div id="appView" class="app-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand-row sidebar-brand">
+          <img class="brand-mark" src="/favicon.png" alt="" />
+          <div>
+            <strong>AI 订阅</strong>
+          </div>
+        </div>
+        <nav class="side-nav" aria-label="主导航">
+          <button class="nav-item active" type="button">
+            <svg class="nav-icon"><use href="#icon-table"></use></svg>
+            数据管理
+          </button>
+          <button class="nav-item" type="button">
+            <svg class="nav-icon"><use href="#icon-users"></use></svg>
+            用户管理
+          </button>
+          <button class="nav-item" type="button">
+            <svg class="nav-icon"><use href="#icon-box"></use></svg>
+            套餐管理
+          </button>
+          <button class="nav-item" type="button">
+            <svg class="nav-icon"><use href="#icon-network"></use></svg>
+            渠道管理
+          </button>
+        </nav>
+        <button id="logoutButton" class="logout-button" type="button">
+          <svg class="ui-icon"><use href="#icon-log-out"></use></svg>
+          退出登录
+        </button>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <button class="menu-button" type="button" aria-label="折叠菜单"><svg class="ui-icon"><use href="#icon-menu"></use></svg></button>
+          <label class="search-box" aria-label="搜索记录">
+            <svg class="ui-icon"><use href="#icon-search"></use></svg>
+            <input id="searchInput" placeholder="搜索用户名称/微信号/账号/备注" />
+          </label>
+          <button id="addButton" class="primary-button add-button" type="button">
+            <svg class="ui-icon"><use href="#icon-plus"></use></svg>
+            新增记录
+            <span class="button-caret">⌄</span>
+          </button>
+          <div class="topbar-divider"></div>
+          <div class="user-chip">
+            <span>A</span>
+            <div>
+              <strong id="currentUser">admin</strong>
+              <small>管理员</small>
+            </div>
+            <span class="chevron">⌄</span>
+          </div>
+        </header>
+
+        <section class="metric-strip" aria-label="数据概览">
+          <article>
+            <span class="metric-icon teal"><svg class="ui-icon"><use href="#icon-user"></use></svg></span>
+            <div>
+              <span>总记录数</span>
+              <strong id="totalMetric">0</strong>
+              <small>较昨日 +32</small>
+            </div>
+          </article>
+          <article>
+            <span class="metric-icon green"><svg class="ui-icon"><use href="#icon-clipboard"></use></svg></span>
+            <div>
+              <span>代充订单</span>
+              <strong id="proxyMetric">0</strong>
+              <small>占比 66.46%</small>
+            </div>
+          </article>
+          <article>
+            <span class="metric-icon orange"><svg class="ui-icon"><use href="#icon-gift"></use></svg></span>
+            <div>
+              <span>成品号码</span>
+              <strong id="finishedMetric">0</strong>
+              <small>占比 33.54%</small>
+            </div>
+          </article>
+          <article>
+            <span class="metric-icon red"><svg class="ui-icon"><use href="#icon-yuan"></use></svg></span>
+            <div>
+              <span>总金额(元)</span>
+              <strong id="priceMetric">￥0.00</strong>
+              <small class="up">较昨日 +8,560.00</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="filters" aria-label="数据筛选">
+          <label>
+            来源:
+            <select id="sourceFilter"></select>
+          </label>
+          <label>
+            套餐:
+            <select id="packageFilter"></select>
+          </label>
+          <label>
+            类型:
+            <select id="typeFilter"></select>
+          </label>
+          <label>
+            状态:
+            <select id="statusFilter">
+              <option>全部状态</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>用户名称</th>
+                  <th>用户微信号</th>
+                  <th>来源</th>
+                  <th>账号</th>
+                  <th>密码</th>
+                  <th>套餐</th>
+                  <th>类型</th>
+                  <th>成本价</th>
+                  <th>售价</th>
+                  <th>购买时间</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>暂无匹配记录</div>
+          </div>
+          <footer class="table-footer">
+            <span id="resultCount">共 0 条记录</span>
+            <div class="pagination">
+              <select id="pageSizeSelect" aria-label="每页条数">
+                <option>20条/页</option>
+                <option>10条/页</option>
+                <option>50条/页</option>
+              </select>
+              <div id="paginationButtons" class="pagination-buttons"></div>
+            </div>
+          </footer>
+        </section>
+      </main>
+
+      <aside id="drawer" class="drawer" aria-label="记录编辑" aria-hidden="true">
+        <div class="drawer-header">
+          <h2 id="drawerTitle">编辑记录</h2>
+          <button id="closeDrawer" class="drawer-close" type="button" aria-label="关闭"><svg class="ui-icon"><use href="#icon-close"></use></svg></button>
+        </div>
+        <form id="recordForm" class="record-form">
+          <input name="id" type="hidden" />
+          <label>用户名称 <span>*</span><input name="userName" required /></label>
+          <label>用户微信号 <span>*</span><input name="wechat" required /></label>
+          <label>来源 <span>*</span><select name="source" required></select></label>
+          <label>账号 <span>*</span><input name="account" required /></label>
+          <label>密码 <span>*</span><input name="password" required /></label>
+          <label>套餐 <span>*</span><select name="packageName" required></select></label>
+          <label>类型 <span>*</span><select name="recordType" required></select></label>
+          <label>成本价 <span>*</span><input name="costPrice" type="number" min="0" step="0.01" required /></label>
+          <label>售价 <span>*</span><input name="salePrice" type="number" min="0" step="0.01" required /></label>
+          <label>购买时间 <span>*</span><input name="purchaseTime" type="date" required /></label>
+          <label class="full">备注<textarea name="remark" rows="5"></textarea></label>
+          <div class="drawer-actions">
+            <button class="secondary-button" type="button" id="cancelEdit">取消</button>
+            <button class="primary-button" type="submit">保存</button>
+            <button class="outline-button" type="submit" data-save-more>保存并新增</button>
+          </div>
+          <div class="drawer-meta">
+            <p>创建时间：<time id="createdAtText">2024-05-18 14:32:21</time></p>
+            <p>更新时间：<time id="updatedAtText">2024-05-18 14:32:21</time></p>
+          </div>
+        </form>
+      </aside>
+    </div>
+
+    <div id="copyToast" class="copy-toast" role="status" hidden>已复制</div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

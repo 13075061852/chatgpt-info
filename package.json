@@ -1,0 +1,15 @@
+{
+  "name": "chatgpt-info",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2026-05-25 --kv=DATA_STORE",
+    "deploy": "wrangler pages deploy public",
+    "check": "wrangler pages functions build functions --compatibility-date=2026-05-25 --outdir=.wrangler-build"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0",
+    "wrangler": "^4.18.0"
+  }
+}
