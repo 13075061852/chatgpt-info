@@ -93,7 +93,7 @@
 
       <main class="workspace">
         <header class="topbar">
-          <button class="menu-button" type="button" aria-label="折叠菜单"><svg class="ui-icon"><use href="#icon-menu"></use></svg></button>
+          <button class="menu-button" type="button" aria-label="展开导航栏" aria-expanded="false"><svg class="ui-icon"><use href="#icon-menu"></use></svg></button>
           <label class="search-box" aria-label="搜索记录">
             <svg class="ui-icon"><use href="#icon-search"></use></svg>
             <input id="searchInput" placeholder="搜索用户名称/微信号/账号/备注" />
@@ -101,34 +101,16 @@
           <button id="addButton" class="primary-button add-button" type="button">
             <svg class="ui-icon"><use href="#icon-plus"></use></svg>
             新增记录
-            <span class="button-caret">⌄</span>
           </button>
-          <div class="topbar-divider"></div>
-          <div class="user-chip">
-            <span>A</span>
-            <div>
-              <strong id="currentUser">admin</strong>
-              <small>管理员</small>
-            </div>
-            <span class="chevron">⌄</span>
-          </div>
         </header>
 
         <section class="metric-strip" aria-label="数据概览">
-          <article>
-            <span class="metric-icon teal"><svg class="ui-icon"><use href="#icon-user"></use></svg></span>
-            <div>
-              <span>总记录数</span>
-              <strong id="totalMetric">0</strong>
-              <small>较昨日 +32</small>
-            </div>
-          </article>
           <article>
             <span class="metric-icon green"><svg class="ui-icon"><use href="#icon-clipboard"></use></svg></span>
             <div>
               <span>代充订单</span>
               <strong id="proxyMetric">0</strong>
-              <small>占比 66.46%</small>
+              <small id="proxyRateMetric">占比 0.00%</small>
             </div>
           </article>
           <article>
@@ -136,7 +118,7 @@
             <div>
               <span>成品号码</span>
               <strong id="finishedMetric">0</strong>
-              <small>占比 33.54%</small>
+              <small id="finishedRateMetric">占比 0.00%</small>
             </div>
           </article>
           <article>
@@ -144,30 +126,17 @@
             <div>
               <span>总金额(元)</span>
               <strong id="priceMetric">￥0.00</strong>
-              <small class="up">较昨日 +8,560.00</small>
+              <small id="priceDeltaMetric">较昨日 +0.00</small>
             </div>
           </article>
-        </section>
-
-        <section class="filters" aria-label="数据筛选">
-          <label>
-            来源:
-            <select id="sourceFilter"></select>
-          </label>
-          <label>
-            套餐:
-            <select id="packageFilter"></select>
-          </label>
-          <label>
-            类型:
-            <select id="typeFilter"></select>
-          </label>
-          <label>
-            状态:
-            <select id="statusFilter">
-              <option>全部状态</option>
-            </select>
-          </label>
+          <article>
+            <span class="metric-icon teal"><svg class="ui-icon"><use href="#icon-wallet"></use></svg></span>
+            <div>
+              <span>净利润(元)</span>
+              <strong id="profitMetric">￥0.00</strong>
+              <small id="profitDeltaMetric">较昨日 +0.00</small>
+            </div>
+          </article>
         </section>
 
         <section class="table-panel">
@@ -178,11 +147,11 @@
                   <th>ID</th>
                   <th>用户名称</th>
                   <th>用户微信号</th>
-                  <th>来源</th>
+                  <th><button class="th-filter" type="button" data-filter-trigger="source"></button></th>
                   <th>账号</th>
                   <th>密码</th>
-                  <th>套餐</th>
-                  <th>类型</th>
+                  <th><button class="th-filter" type="button" data-filter-trigger="packageName"></button></th>
+                  <th><button class="th-filter" type="button" data-filter-trigger="recordType"></button></th>
                   <th>成本价</th>
                   <th>售价</th>
                   <th>购买时间</th>
@@ -192,6 +161,7 @@
               </thead>
               <tbody id="recordsBody"></tbody>
             </table>
+            <div id="filterPopup" class="filter-popup" hidden></div>
             <div id="emptyState" class="empty-state" hidden>暂无匹配记录</div>
           </div>
           <footer class="table-footer">
@@ -228,12 +198,7 @@
           <label class="full">备注<textarea name="remark" rows="5"></textarea></label>
           <div class="drawer-actions">
             <button class="secondary-button" type="button" id="cancelEdit">取消</button>
-            <button class="primary-button" type="submit">保存</button>
-            <button class="outline-button" type="submit" data-save-more>保存并新增</button>
-          </div>
-          <div class="drawer-meta">
-            <p>创建时间：<time id="createdAtText">2024-05-18 14:32:21</time></p>
-            <p>更新时间：<time id="updatedAtText">2024-05-18 14:32:21</time></p>
+            <button class="primary-button" type="submit" id="recordSubmitButton">保存</button>
           </div>
         </form>
       </aside>

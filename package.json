@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler pages dev public --compatibility-date=2026-05-25 --kv=DATA_STORE",
+    "dev": "npm run sync:remote && wrangler pages dev public --compatibility-date=2026-05-25 --kv=DATA_STORE",
+    "dev:local": "wrangler pages dev public --compatibility-date=2026-05-25 --kv=DATA_STORE",
+    "sync:remote": "node scripts/sync-remote-records.mjs",
     "deploy": "wrangler pages deploy public",
     "check": "wrangler pages functions build functions --compatibility-date=2026-05-25 --outdir=.wrangler-build"
   },

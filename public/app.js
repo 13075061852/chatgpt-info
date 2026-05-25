@@ -13,17 +13,21 @@ const state = {
   pagination: {
     page: 1,
     pageSize: 20
-  }
+  },
+  activeFilter: null
 };
 
 const loginView = document.querySelector("#loginView");
 const appView = document.querySelector("#appView");
+const sidebar = document.querySelector(".sidebar");
+const menuButton = document.querySelector(".menu-button");
 const recordsBody = document.querySelector("#recordsBody");
 const emptyState = document.querySelector("#emptyState");
 const drawer = document.querySelector("#drawer");
 const recordForm = document.querySelector("#recordForm");
+const recordSubmitButton = document.querySelector("#recordSubmitButton");
 const copyToast = document.querySelector("#copyToast");
-let submitMode = "save";
+const filterPopup = document.querySelector("#filterPopup");
 
 const api = async (path, options = {}) => {
   const response = await fetch(path, {
@@ -49,7 +53,42 @@ const money = (value, minimumFractionDigits = 2) => {
   return `￥${number.toLocaleString("zh-CN", { minimumFractionDigits, maximumFractionDigits: 2 })}`;
 };
 
+const signedNumber = (value, minimumFractionDigits = 0) => {
+  const number = Number(value || 0);
+  const sign = number > 0 ? "+" : number < 0 ? "-" : "+";
+  return `${sign}${Math.abs(number).toLocaleString("zh-CN", { minimumFractionDigits, maximumFractionDigits: 2 })}`;
+};
+
+const dateKey = (date) => {
+  const value = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(value.getTime())) return "";
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+};
+
+const recordDateKey = (record) => {
+  const value = record.purchaseTime || record.createdAt;
+  const text = String(value || "");
+  return /^\d{4}-\d{2}-\d{2}/.test(text) ? text.slice(0, 10) : dateKey(value);
+};
+
+const setDeltaClass = (element, value) => {
+  element.classList.toggle("up", value > 0);
+  element.classList.toggle("down", value < 0);
+};
+
+const closeSidebar = () => {
+  appView.classList.remove("sidebar-open");
+  menuButton.setAttribute("aria-expanded", "false");
+};
+
+const toggleSidebar = () => {
+  const isOpen = appView.classList.toggle("sidebar-open");
+  menuButton.setAttribute("aria-expanded", String(isOpen));
+};
+
 const showLogin = () => {
+  closeSidebar();
   loginView.hidden = false;
   appView.hidden = true;
 };
@@ -59,20 +98,29 @@ const showApp = () => {
   appView.hidden = false;
 };
 
-const fillSelect = (select, values) => {
-  const allLabels = {
-    sourceFilter: "全部来源",
-    packageFilter: "全部套餐",
-    typeFilter: "全部类型"
-  };
-  select.innerHTML = values.map((item) => `<option value="${item}">${item === "全部" ? allLabels[select.id] || "全部" : item}</option>`).join("");
-};
-
 const fillFormSelect = (select, values) => {
   select.innerHTML = values.slice(1).map((item) => `<option value="${item}">${item}</option>`).join("");
 };
 
 const icon = (name, className = "ui-icon") => `<svg class="${className}" aria-hidden="true"><use href="#icon-${name}"></use></svg>`;
+
+const filterConfigs = {
+  source: {
+    label: "来源",
+    stateKey: "source",
+    values: sources
+  },
+  packageName: {
+    label: "套餐",
+    stateKey: "packageName",
+    values: packages
+  },
+  recordType: {
+    label: "类型",
+    stateKey: "recordType",
+    values: types
+  }
+};
 
 const sourceLogo = (source) =>
   ({
@@ -88,12 +136,63 @@ const resetToFirstPage = () => {
 };
 
 const setupFilters = () => {
-  fillSelect(document.querySelector("#sourceFilter"), sources);
-  fillSelect(document.querySelector("#packageFilter"), packages);
-  fillSelect(document.querySelector("#typeFilter"), types);
   fillFormSelect(recordForm.elements.source, sources);
   fillFormSelect(recordForm.elements.packageName, packages);
   fillFormSelect(recordForm.elements.recordType, types);
+  renderFilterTriggers();
+};
+
+const renderFilterTriggers = () => {
+  document.querySelectorAll("[data-filter-trigger]").forEach((button) => {
+    const config = filterConfigs[button.dataset.filterTrigger];
+    const value = state.filters[config.stateKey];
+    const selected = value === "全部" ? config.label : value;
+    button.classList.toggle("active", value !== "全部");
+    button.innerHTML = `<span class="th-filter-value">${escapeHtml(selected)}</span>${icon("filter")}`;
+  });
+};
+
+const closeFilterPopup = () => {
+  state.activeFilter = null;
+  filterPopup.hidden = true;
+  filterPopup.innerHTML = "";
+};
+
+const openFilterPopup = (filterKey, anchor) => {
+  const config = filterConfigs[filterKey];
+  if (!config) return;
+
+  if (!filterPopup.hidden && state.activeFilter === filterKey) {
+    closeFilterPopup();
+    return;
+  }
+
+  const currentValue = state.filters[config.stateKey];
+  filterPopup.innerHTML = config.values
+    .map((value) => {
+      const label = value === "全部" ? `全部${config.label}` : value;
+      const active = value === currentValue ? "active" : "";
+      return `<button class="${active}" type="button" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(value)}">${escapeHtml(label)}</button>`;
+    })
+    .join("");
+
+  const rect = anchor.getBoundingClientRect();
+  const width = 190;
+  const left = Math.min(rect.left, window.innerWidth - width - 8);
+  filterPopup.style.left = `${Math.max(8, left)}px`;
+  filterPopup.style.top = `${rect.bottom + 6}px`;
+  filterPopup.hidden = false;
+  state.activeFilter = filterKey;
+};
+
+const applyHeaderFilter = (filterKey, value) => {
+  const config = filterConfigs[filterKey];
+  if (!config) return;
+  state.filters[config.stateKey] = value;
+  resetToFirstPage();
+  renderFilterTriggers();
+  render();
+  closeFilterPopup();
 };
 
 const filteredRecords = () => {
@@ -125,10 +224,44 @@ const renderMetrics = () => {
   const proxyCount = state.records.filter((item) => item.recordType === "代充").length;
   const finished = state.records.filter((item) => item.recordType === "成品号").length;
   const price = state.records.reduce((sum, item) => sum + Number(item.salePrice ?? item.price ?? 0), 0);
-  document.querySelector("#totalMetric").textContent = total.toLocaleString("zh-CN");
+  const profit = state.records.reduce(
+    (sum, item) => sum + Number(item.salePrice ?? item.price ?? 0) - Number(item.costPrice ?? item.price ?? 0),
+    0
+  );
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const todayKey = dateKey(today);
+  const yesterdayKey = dateKey(yesterday);
+  const todayRecords = state.records.filter((item) => recordDateKey(item) === todayKey);
+  const yesterdayRecords = state.records.filter((item) => recordDateKey(item) === yesterdayKey);
+  const todayPrice = todayRecords.reduce((sum, item) => sum + Number(item.salePrice ?? item.price ?? 0), 0);
+  const yesterdayPrice = yesterdayRecords.reduce((sum, item) => sum + Number(item.salePrice ?? item.price ?? 0), 0);
+  const todayProfit = todayRecords.reduce(
+    (sum, item) => sum + Number(item.salePrice ?? item.price ?? 0) - Number(item.costPrice ?? item.price ?? 0),
+    0
+  );
+  const yesterdayProfit = yesterdayRecords.reduce(
+    (sum, item) => sum + Number(item.salePrice ?? item.price ?? 0) - Number(item.costPrice ?? item.price ?? 0),
+    0
+  );
+  const priceDelta = todayPrice - yesterdayPrice;
+  const profitDelta = todayProfit - yesterdayProfit;
+  const proxyRate = total ? (proxyCount / total) * 100 : 0;
+  const finishedRate = total ? (finished / total) * 100 : 0;
+  const priceDeltaMetric = document.querySelector("#priceDeltaMetric");
+  const profitDeltaMetric = document.querySelector("#profitDeltaMetric");
+
   document.querySelector("#proxyMetric").textContent = proxyCount.toLocaleString("zh-CN");
   document.querySelector("#finishedMetric").textContent = finished.toLocaleString("zh-CN");
   document.querySelector("#priceMetric").textContent = money(price);
+  document.querySelector("#profitMetric").textContent = money(profit);
+  document.querySelector("#proxyRateMetric").textContent = `占比 ${proxyRate.toFixed(2)}%`;
+  document.querySelector("#finishedRateMetric").textContent = `占比 ${finishedRate.toFixed(2)}%`;
+  priceDeltaMetric.textContent = `较昨日 ${signedNumber(priceDelta, 2)}`;
+  profitDeltaMetric.textContent = `较昨日 ${signedNumber(profitDelta, 2)}`;
+  setDeltaClass(priceDeltaMetric, priceDelta);
+  setDeltaClass(profitDeltaMetric, profitDelta);
 };
 
 const typeClass = (type) => (type === "成品号" ? "type-tag finished" : "type-tag proxy");
@@ -225,6 +358,7 @@ const renderTable = () => {
 
 const render = () => {
   renderMetrics();
+  renderFilterTriggers();
   renderTable();
 };
 
@@ -236,16 +370,10 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-const formatDate = (value) => {
-  if (!value) return "2024-05-18 14:32:21";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "2024-05-18 14:32:21";
-  return date.toLocaleString("zh-CN", { hour12: false }).replaceAll("/", "-");
-};
-
 const openDrawer = (record = null) => {
   recordForm.reset();
   document.querySelector("#drawerTitle").textContent = record ? "编辑记录" : "新增记录";
+  recordSubmitButton.textContent = record ? "更新" : "保存";
   recordForm.elements.id.value = record?.id || "";
   recordForm.elements.userName.value = record?.userName || "";
   recordForm.elements.wechat.value = record?.wechat || "";
@@ -258,8 +386,6 @@ const openDrawer = (record = null) => {
   recordForm.elements.salePrice.value = record?.salePrice ?? record?.price ?? "";
   recordForm.elements.purchaseTime.value = toDateValue(record?.purchaseTime);
   recordForm.elements.remark.value = record?.remark || "";
-  document.querySelector("#createdAtText").textContent = formatDate(record?.createdAt);
-  document.querySelector("#updatedAtText").textContent = formatDate(record?.updatedAt);
   drawer.setAttribute("aria-hidden", "false");
 };
 
@@ -299,8 +425,7 @@ const loadRecords = async () => {
 
 const initSession = async () => {
   try {
-    const data = await api("/api/me");
-    document.querySelector("#currentUser").textContent = data.user.username;
+    await api("/api/me");
     showApp();
     await loadRecords();
   } catch {
@@ -314,14 +439,13 @@ document.querySelector("#loginForm").addEventListener("submit", async (event) =>
   document.querySelector("#loginError").textContent = "";
 
   try {
-    const data = await api("/api/login", {
+    await api("/api/login", {
       method: "POST",
       body: JSON.stringify({
         username: form.get("username"),
         password: form.get("password")
       })
     });
-    document.querySelector("#currentUser").textContent = data.user.username;
     showApp();
     await loadRecords();
   } catch (error) {
@@ -334,28 +458,49 @@ document.querySelector("#logoutButton").addEventListener("click", async () => {
   showLogin();
 });
 
+menuButton.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleSidebar();
+});
+
+sidebar.addEventListener("click", (event) => {
+  if (event.target.closest(".nav-item")) closeSidebar();
+});
+
 document.querySelector("#searchInput").addEventListener("input", (event) => {
   state.filters.query = event.target.value;
   resetToFirstPage();
   render();
 });
 
-document.querySelector("#sourceFilter").addEventListener("change", (event) => {
-  state.filters.source = event.target.value;
-  resetToFirstPage();
-  render();
+document.addEventListener("click", (event) => {
+  const filterTrigger = event.target.closest("[data-filter-trigger]");
+  const filterOption = event.target.closest("[data-filter-key]");
+
+  if (appView.classList.contains("sidebar-open") && !event.target.closest(".sidebar") && !event.target.closest(".menu-button")) {
+    closeSidebar();
+  }
+
+  if (filterTrigger) {
+    openFilterPopup(filterTrigger.dataset.filterTrigger, filterTrigger);
+    return;
+  }
+
+  if (filterOption) {
+    applyHeaderFilter(filterOption.dataset.filterKey, filterOption.dataset.filterValue);
+    return;
+  }
+
+  if (!event.target.closest("#filterPopup")) {
+    closeFilterPopup();
+  }
 });
 
-document.querySelector("#packageFilter").addEventListener("change", (event) => {
-  state.filters.packageName = event.target.value;
-  resetToFirstPage();
-  render();
-});
-
-document.querySelector("#typeFilter").addEventListener("change", (event) => {
-  state.filters.recordType = event.target.value;
-  resetToFirstPage();
-  render();
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeFilterPopup();
+    closeSidebar();
+  }
 });
 
 document.querySelector("#pageSizeSelect").addEventListener("change", (event) => {
@@ -374,14 +519,6 @@ document.querySelector("#paginationButtons").addEventListener("click", (event) =
 document.querySelector("#addButton").addEventListener("click", () => openDrawer());
 document.querySelector("#closeDrawer").addEventListener("click", closeDrawer);
 document.querySelector("#cancelEdit").addEventListener("click", closeDrawer);
-
-document.querySelector("[data-save-more]").addEventListener("click", () => {
-  submitMode = "save-more";
-});
-
-recordForm.addEventListener("click", (event) => {
-  if (!event.target.matches("[data-save-more]")) submitMode = "save";
-});
 
 recordsBody.addEventListener("click", async (event) => {
   const copyButton = event.target.closest("[data-copy]");
@@ -417,12 +554,7 @@ recordForm.addEventListener("submit", async (event) => {
   });
 
   await loadRecords();
-  if (submitMode === "save-more") {
-    openDrawer();
-  } else {
-    closeDrawer();
-  }
-  submitMode = "save";
+  closeDrawer();
 });
 
 setupFilters();

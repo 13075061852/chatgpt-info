@@ -4,5 +4,4 @@ pages_build_output_dir = "public"
 
 [[kv_namespaces]]
 binding = "DATA_STORE"
-id = "replace-with-production-kv-id"
-preview_id = "replace-with-preview-kv-id"
+id = "f2d604ad95ae4b68a07f263193bc8601"
